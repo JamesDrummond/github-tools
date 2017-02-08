@@ -1,1 +1,0 @@
-$wnd.com_codenvy_github_tools_MyComponentWidgetset.runAsyncCallback2('Cgb(1604,1,Z_d);_.Pd=function ihc(){g2b((!_1b&&(_1b=new l2b),_1b),this.a.d)};jVd(Xk)(2);\n//# sourceURL=com.codenvy.github.tools.MyComponentWidgetset-2.js\n')

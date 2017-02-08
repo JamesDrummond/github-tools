@@ -7,5 +7,6 @@ com/codenvy/github/tools/client/MyComponentServerRpc.class
 com/codenvy/github/tools/MyUI.class
 com/codenvy/github/tools/MyUI$MyUIServlet.class
 com/codenvy/github/tools/client/MyComponentWidget.class
+com/codenvy/github/tools/GithubIssue.class
 com/codenvy/github/tools/MyComponent$1.class
 com/codenvy/github/tools/ChangeLog.class

@@ -28,49 +28,111 @@ import com.vaadin.ui.VerticalLayout;
 public class MyUI extends UI {
     
     final TextField milestone = new TextField();
+    final TextField label = new TextField();
+    final TextField excludeLabel = new TextField();
+    final TextField oauth2Token = new TextField();
 
     @Override
     protected void init(VaadinRequest vaadinRequest) {
         final VerticalLayout layout = new VerticalLayout();
+        oauth2Token.setCaption("Enter required oauth token here");
         milestone.setCaption("Type milestone number here");
+        label.setCaption("Type label to filter here");
+        excludeLabel.setCaption("Type exclude label filter here");
         //final MyComponent mycomponent = new MyComponent();
-
-        Button button = new Button("Get PR Changelogs");
-        button.addClickListener( e -> {
-            if(milestone.getValue().length()>0){
-                
-                layout.addComponent(githubChangelogs("codenvy", "codenvy",this.milestone.getValue()));
-                layout.addComponent(githubChangelogs("eclipse", "che",this.milestone.getValue()));
+        Button buttonPR = new Button("Get PR Changelogs");
+        Button buttonLabel = new Button("Get Filtered Issues");
+        buttonPR.addClickListener( e -> {
+            if(oauth2Token.getValue().length()>0){
+                String oauth2TokenStr = oauth2Token.getValue();
+                if(milestone.getValue().length()>0){
+                    layout.addComponent(githubChangelogs(oauth2TokenStr,"codenvy", "codenvy",this.milestone.getValue()));
+                    layout.addComponent(githubChangelogs(oauth2TokenStr,"eclipse", "che",this.milestone.getValue()));
+                }
+                else{
+                    milestone.setComponentError(new UserError("Error please enter a milestone."));
+                }
             }
             else{
-                milestone.setComponentError(new UserError("Error please enter a milestone."));
+                oauth2Token.setComponentError(new UserError("Error please enter a required oauth token."));
             }
-            //layout.addComponent(new Label("Thanks " + name.getValue() 
-            //        + ", it works!"));
+
         });
         
-        layout.addComponents(milestone, button);        
+    
+        buttonLabel.addClickListener( e -> {
+            
+            if(oauth2Token.getValue().length()>0){
+                String oauth2TokenStr = oauth2Token.getValue();
+                if(label.getValue().length()>0 && excludeLabel.getValue().length()>0){
+                    layout.addComponent(githubIssuesWithLabel(oauth2TokenStr,"codenvy", "codenvy",this.label.getValue(),this.excludeLabel.getValue()));
+                    layout.addComponent(githubIssuesWithLabel(oauth2TokenStr,"codenvy", "infrastructure",this.label.getValue(),this.excludeLabel.getValue()));
+                    layout.addComponent(githubIssuesWithLabel(oauth2TokenStr,"codenvy", "enterprise",this.label.getValue(),this.excludeLabel.getValue()));
+                    layout.addComponent(githubIssuesWithLabel(oauth2TokenStr,"eclipse", "che",this.label.getValue(),this.excludeLabel.getValue()));
+                }
+                else if(label.getValue().length()>0){
+                    layout.addComponent(githubIssuesWithLabel(oauth2TokenStr,"codenvy", "codenvy",this.label.getValue(),""));
+                    layout.addComponent(githubIssuesWithLabel(oauth2TokenStr,"codenvy", "infrastructure",this.label.getValue(),this.excludeLabel.getValue()));
+                    layout.addComponent(githubIssuesWithLabel(oauth2TokenStr,"codenvy", "enterprise",this.label.getValue(),this.excludeLabel.getValue()));
+                    layout.addComponent(githubIssuesWithLabel(oauth2TokenStr,"eclipse", "che",this.label.getValue(),""));
+                }
+                else{
+                    label.setComponentError(new UserError("Error please enter a label to filter with."));
+                }
+            }
+            else{
+                oauth2Token.setComponentError(new UserError("Error please enter a required oauth token."));
+            }
+        });
+        layout.addComponents(oauth2Token,milestone,label,excludeLabel,buttonPR,buttonLabel);        
         layout.setMargin(true);
         layout.setSpacing(true);
         
         setContent(layout);
     }
     
-    private Label githubChangelogs(String repoOwner,String repoName,String milestone){
+    private Label githubChangelogs(String oauth2TokenStr,String repoOwner,String repoName,String milestone){
         final Label labelChangeLog = new Label();
         Client client = new Client();
+        client.oauth2Token=oauth2TokenStr;
         labelChangeLog.setContentMode(ContentMode.HTML);
-        if(client.init(repoOwner,repoName,milestone)){
-            String changelogs = "The follow are changelogs for "+repoOwner+":<br/>"+client.getChangeLog()+"<br/>";
-            String notfound = "The follow are PRs without changelogs for "+repoOwner+":<br/>"+client.getNotFound()+"<br/>";
-            labelChangeLog.setValue(changelogs+notfound);
-            labelChangeLog.setImmediate(true);
-            labelChangeLog.setSizeFull();
-            this.milestone.setCaption("Type milestone number here");
+        if(client.init(repoOwner,repoName)){
+            if(client.initPRmilestone(milestone)){
+                String changelogs = "The follow are changelogs for "+repoOwner+"/"+repoName+":<br/>"+client.getChangeLog()+"<br/>";
+                String notfound = "The follow are PRs without changelogs for "+repoOwner+"/"+repoName+":<br/>"+client.getNotFound()+"<br/>";
+                labelChangeLog.setValue(changelogs+notfound);
+                labelChangeLog.setImmediate(true);
+                labelChangeLog.setSizeFull();
+                this.milestone.setCaption("Type milestone number here");
+            }
+            else{
+                this.milestone.setComponentError(new UserError("Error Something went wrong."));
+            }
         }
-        else{
-            this.milestone.setComponentError(new UserError("Error Something went wrong."));
+
+        
+        return labelChangeLog;
+    }
+    
+    private Label githubIssuesWithLabel(String oauth2TokenStr,String repoOwner,String repoName,String labelStr,String excludeLabelStr){
+        final Label labelChangeLog = new Label();
+        Client client = new Client();
+        client.oauth2Token=oauth2TokenStr;
+        labelChangeLog.setContentMode(ContentMode.HTML);
+        if(client.init(repoOwner,repoName)){
+            if(client.initIssues(labelStr,excludeLabelStr)){
+                String changelogs = "The follow are issues for "+repoOwner+":<br/>"+client.getIssues()+"<br/>";
+                labelChangeLog.setValue(changelogs);
+                labelChangeLog.setImmediate(true);
+                labelChangeLog.setSizeFull();
+                this.label.setCaption("Type label to filter here");
+                this.excludeLabel.setCaption("Type exclude label filter here");
+            }
+            else{
+                this.label.setComponentError(new UserError("Error Something went wrong."));
+            }
         }
+        
         return labelChangeLog;
     }
 

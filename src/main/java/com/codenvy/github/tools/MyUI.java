@@ -48,6 +48,7 @@ public class MyUI extends UI {
                 if(milestone.getValue().length()>0){
                     layout.addComponent(githubChangelogs(oauth2TokenStr,"codenvy", "codenvy",this.milestone.getValue()));
                     layout.addComponent(githubChangelogs(oauth2TokenStr,"eclipse", "che",this.milestone.getValue()));
+                    layout.addComponent(githubChangelogs(oauth2TokenStr,"eclipse", "che-dockerfiles",this.milestone.getValue()));
                 }
                 else{
                     milestone.setComponentError(new UserError("Error please enter a milestone."));
@@ -69,12 +70,14 @@ public class MyUI extends UI {
                     layout.addComponent(githubIssuesWithLabel(oauth2TokenStr,"codenvy", "infrastructure",this.label.getValue(),this.excludeLabel.getValue()));
                     layout.addComponent(githubIssuesWithLabel(oauth2TokenStr,"codenvy", "enterprise",this.label.getValue(),this.excludeLabel.getValue()));
                     layout.addComponent(githubIssuesWithLabel(oauth2TokenStr,"eclipse", "che",this.label.getValue(),this.excludeLabel.getValue()));
+                    layout.addComponent(githubIssuesWithLabel(oauth2TokenStr,"eclipse", "che-dockerfiles",this.label.getValue(),this.excludeLabel.getValue()));
                 }
                 else if(label.getValue().length()>0){
                     layout.addComponent(githubIssuesWithLabel(oauth2TokenStr,"codenvy", "codenvy",this.label.getValue(),""));
                     layout.addComponent(githubIssuesWithLabel(oauth2TokenStr,"codenvy", "infrastructure",this.label.getValue(),this.excludeLabel.getValue()));
                     layout.addComponent(githubIssuesWithLabel(oauth2TokenStr,"codenvy", "enterprise",this.label.getValue(),this.excludeLabel.getValue()));
                     layout.addComponent(githubIssuesWithLabel(oauth2TokenStr,"eclipse", "che",this.label.getValue(),""));
+                    layout.addComponent(githubIssuesWithLabel(oauth2TokenStr,"eclipse", "che-dockerfiles",this.label.getValue(),""));
                 }
                 else{
                     label.setComponentError(new UserError("Error please enter a label to filter with."));

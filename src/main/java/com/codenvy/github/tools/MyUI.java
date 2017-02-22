@@ -1,7 +1,8 @@
 package com.codenvy.github.tools;
 
-import javax.servlet.annotation.WebServlet;
+import com.codenvy.github.tools.Client;
 
+import javax.servlet.annotation.WebServlet;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.annotations.Widgetset;
@@ -10,11 +11,26 @@ import com.vaadin.server.VaadinServlet;
 import com.vaadin.server.UserError;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Label;
-import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
+
+import org.eclipse.egit.github.core.client.GitHubClient;
+import org.eclipse.egit.github.core.client.GitHubRequest;
+import org.eclipse.egit.github.core.client.GitHubResponse;
+import org.eclipse.egit.github.core.service.RepositoryService; 
+import org.eclipse.egit.github.core.IRepositoryIdProvider;
+import org.eclipse.egit.github.core.PullRequest;
+import org.eclipse.egit.github.core.Repository;
+import org.eclipse.egit.github.core.RepositoryIssue;
+import org.eclipse.egit.github.core.SearchIssue;
+import org.eclipse.egit.github.core.Milestone;
+import org.eclipse.egit.github.core.Issue;
+import org.eclipse.egit.github.core.SearchRepository;
+import org.eclipse.egit.github.core.service.PullRequestService;
+import org.eclipse.egit.github.core.service.IssueService;
 
 /**
  * This UI is the application entry point. A UI may either represent a browser window 
@@ -24,16 +40,17 @@ import com.vaadin.ui.VerticalLayout;
  * overridden to add component to the user interface and initialize non-component functionality.
  */
 @Theme("mytheme")  
-@Widgetset("com.codenvy.github.tools.MyComponentWidgetset")
 public class MyUI extends UI {
     
     final TextField milestone = new TextField();
     final TextField label = new TextField();
     final TextField excludeLabel = new TextField();
     final TextField oauth2Token = new TextField();
+    private Client client;
 
     @Override
     protected void init(VaadinRequest vaadinRequest) {
+        client = new Client();
         final VerticalLayout layout = new VerticalLayout();
         oauth2Token.setCaption("Enter required oauth token here");
         milestone.setCaption("Type milestone number here");
@@ -96,7 +113,6 @@ public class MyUI extends UI {
     
     private Label githubChangelogs(String oauth2TokenStr,String repoOwner,String repoName,String milestone){
         final Label labelChangeLog = new Label();
-        Client client = new Client();
         client.oauth2Token=oauth2TokenStr;
         labelChangeLog.setContentMode(ContentMode.HTML);
         if(client.init(repoOwner,repoName)){
@@ -104,7 +120,6 @@ public class MyUI extends UI {
                 String changelogs = "The follow are changelogs for "+repoOwner+"/"+repoName+":<br/>"+client.getChangeLog()+"<br/>";
                 String notfound = "The follow are PRs without changelogs for "+repoOwner+"/"+repoName+":<br/>"+client.getNotFound()+"<br/>";
                 labelChangeLog.setValue(changelogs+notfound);
-                labelChangeLog.setImmediate(true);
                 labelChangeLog.setSizeFull();
                 this.milestone.setCaption("Type milestone number here");
             }
@@ -126,7 +141,6 @@ public class MyUI extends UI {
             if(client.initIssues(labelStr,excludeLabelStr)){
                 String changelogs = "The follow are issues for "+repoOwner+":<br/>"+client.getIssues()+"<br/>";
                 labelChangeLog.setValue(changelogs);
-                labelChangeLog.setImmediate(true);
                 labelChangeLog.setSizeFull();
                 this.label.setCaption("Type label to filter here");
                 this.excludeLabel.setCaption("Type exclude label filter here");
@@ -138,9 +152,10 @@ public class MyUI extends UI {
         
         return labelChangeLog;
     }
-
+    
     @WebServlet(urlPatterns = "/*", name = "MyUIServlet", asyncSupported = true)
-    @VaadinServletConfiguration(ui = MyUI.class, productionMode = false,widgetset="com.codenvy.github.tools.MyComponentWidgetset")
+    @VaadinServletConfiguration(ui = MyUI.class, productionMode = false)
     public static class MyUIServlet extends VaadinServlet {
     }
+
 }

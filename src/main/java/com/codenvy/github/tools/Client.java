@@ -1,6 +1,5 @@
 package com.codenvy.github.tools;
 
-import com.codenvy.github.tools.MyComponent;
 import com.codenvy.github.tools.ChangeLog;
 import com.codenvy.github.tools.GithubIssue;
 
@@ -167,7 +166,7 @@ public class Client {
         Iterator<ChangeLog> itrRel = releaseNotesNotFound.iterator();		    
 		while(itrRel.hasNext()) {
 		    ChangeLog cl = itrRel.next();
-		    changeLogStr="<a href='https://github.com/"+repoOwner+"/"+repoName+"/pull/"+cl.number+"'>["+cl.number+"]</a>(https://github.com/"+repoOwner+"/"+repoName+"/pull/"+cl.number+")<br/>";
+		    changeLogStr=changeLogStr+"<a href='https://github.com/"+repoOwner+"/"+repoName+"/pull/"+cl.number+"'>["+cl.number+"]</a>(https://github.com/"+repoOwner+"/"+repoName+"/pull/"+cl.number+")<br/>";
 	    }
         return changeLogStr;
     }

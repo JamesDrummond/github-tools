@@ -139,7 +139,7 @@ public class MyUI extends UI {
         labelChangeLog.setContentMode(ContentMode.HTML);
         if(client.init(repoOwner,repoName)){
             if(client.initIssues(labelStr,excludeLabelStr)){
-                String changelogs = "The follow are issues for "+repoOwner+":<br/>"+client.getIssues()+"<br/>";
+                String changelogs = "The follow are issues for "+repoOwner+"/"+repoName+":<br/>"+client.getIssues()+"<br/>";
                 labelChangeLog.setValue(changelogs);
                 labelChangeLog.setSizeFull();
                 this.label.setCaption("Type label to filter here");

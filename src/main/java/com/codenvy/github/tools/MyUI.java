@@ -50,7 +50,7 @@ public class MyUI extends UI {
 
     @Override
     protected void init(VaadinRequest vaadinRequest) {
-        client = new Client();
+        
         final VerticalLayout layout = new VerticalLayout();
         oauth2Token.setCaption("Enter required oauth token here");
         milestone.setCaption("Type milestone number here");
@@ -112,6 +112,7 @@ public class MyUI extends UI {
     }
     
     private Label githubChangelogs(String oauth2TokenStr,String repoOwner,String repoName,String milestone){
+        client = new Client();
         final Label labelChangeLog = new Label();
         client.oauth2Token=oauth2TokenStr;
         labelChangeLog.setContentMode(ContentMode.HTML);
